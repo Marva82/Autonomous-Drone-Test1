@@ -4,3 +4,6 @@
 .vscode/
 *.pyc
 __pycache__/
+build/
+install/
+log/
