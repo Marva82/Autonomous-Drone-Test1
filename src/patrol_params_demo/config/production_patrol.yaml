@@ -1,0 +1,8 @@
+/patrol_config:
+  ros__parameters:
+    site_name: "Monticello Mill Perimeter"
+    sweep_altitude_m: 45.0
+    cruise_speed_mps: 8.0
+    leg_count: 6
+    leg_length_m: 250.0
+    return_home: true
