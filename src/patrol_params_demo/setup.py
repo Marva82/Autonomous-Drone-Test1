@@ -22,7 +22,8 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'patrol_node = patrol_params_demo.patrol_config:main',
-        ],
+    'patrol_node = patrol_params_demo.patrol_config:main',
+    'mission_commander = patrol_params_demo.mission_commander:main',
+    ],
     },
 )
