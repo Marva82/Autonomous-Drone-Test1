@@ -1,0 +1,29 @@
+# ros_gz_bridge YAML Configuration
+# Maps Gazebo Protobuf messages to ROS 2 DDS messages
+
+- ros_topic_name: "/imu/data"
+  gz_topic_name: "/imu_sensor"
+  ros_type_name: "sensor_msgs/msg/Imu"
+  gz_type_name: "gz.msgs.IMU"
+  direction: GZ_TO_ROS
+
+- ros_topic_name: "/gps/fix"
+  gz_topic_name: "/gps_sensor"
+  ros_type_name: "sensor_msgs/msg/NavSatFix"
+  gz_type_name: "gz.msgs.NavSat"
+  direction: GZ_TO_ROS
+
+- ros_topic_name: "/camera/image_raw"
+  gz_topic_name: "/main_camera"
+  ros_type_name: "sensor_msgs/msg/Image"
+  gz_type_name: "gz.msgs.Image"
+  direction: GZ_TO_ROS
+
+- ros_topic_name: "/lidar/scan"
+  gz_topic_name: "/lidar_sensor"
+  ros_type_name: "sensor_msgs/msg/LaserScan"
+  gz_type_name: "gz.msgs.LaserScan"
+  direction: GZ_TO_ROS
+  
+# Note: ArduPilot handles the motor commands directly via JSON over UDP. 
+# We do NOT bridge the motor commands into ROS 2 here.

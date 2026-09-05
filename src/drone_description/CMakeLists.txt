@@ -23,4 +23,19 @@ if(BUILD_TESTING)
   ament_lint_auto_find_test_dependencies()
 endif()
 
+# ==========================================
+# INSTALL DIRECTORIES
+# This tells colcon build to copy these folders 
+# into the install/drone_description/share directory
+# so ROS 2 and Gazebo can actually find them.
+# ==========================================
+install(DIRECTORY
+  launch
+  urdf
+  meshes
+  worlds
+  config
+  DESTINATION share/${PROJECT_NAME}
+)
+
 ament_package()
