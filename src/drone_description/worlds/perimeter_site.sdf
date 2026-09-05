@@ -1,0 +1,104 @@
+<?xml version="1.0" ?>
+<!-- 
+  SDF version 1.8 is standard for modern Gazebo (Ignition).
+  We define a <world> which contains everything: physics, lights, and models.
+-->
+<sdf version="1.8">
+  <world name="perimeter_site">
+
+    <!-- ========================================== -->
+    <!-- 1. PHYSICS ENGINE CONFIGURATION            -->
+    <!-- ========================================== -->
+    <!-- 
+      Drones require high-frequency physics. Multirotor flight controllers 
+      run fast control loops (rate loops). If the physics engine updates too 
+      slowly, it causes "aliasing" (the simulation misses the rapid changes 
+      in propeller thrust), causing the drone to twitch or crash.
+      
+      Math: 250 Hz = 1 / 250 = 0.004 seconds per step. 
+      real_time_factor = 1 means 1 second in simulation = 1 second in real life.
+    -->
+    <physics name="fast_physics" type="ignored">
+      <max_step_size>0.004</max_step_size>
+      <real_time_factor>1.0</real_time_factor>
+    </physics>
+
+    <!-- ========================================== -->
+    <!-- 2. GAZEBO PLUGINS                          -->
+    <!-- ========================================== -->
+    <!-- 
+      Modern Gazebo is modular. If you don't load a plugin, that feature 
+      literally does not exist. We must explicitly load physics, user commands 
+      (so we can spawn things), and the scene broadcaster (to see it).
+    -->
+    <plugin filename="gz-sim-physics-system" name="gz::sim::systems::Physics"/>
+    <plugin filename="gz-sim-user-commands-system" name="gz::sim::systems::UserCommands"/>
+    <plugin filename="gz-sim-scene-broadcaster-system" name="gz::sim::systems::SceneBroadcaster"/>
+    <!-- The sensor system handles cameras, lidars, and IMUs -->
+    <plugin filename="gz-sim-sensors-system" name="gz::sim::systems::Sensors">
+      <render_engine>ogre2</render_engine>
+    </plugin>
+
+    <!-- ========================================== -->
+    <!-- 3. LIGHTING                                -->
+    <!-- ========================================== -->
+    <light type="directional" name="sun">
+      <cast_shadows>true</cast_shadows>
+      <!-- Pose is X Y Z Roll Pitch Yaw. We put the sun 40m straight up -->
+      <pose>0 0 40 0 0 0</pose>
+      <!-- Diffuse dictates the color and intensity of the light reflecting off objects -->
+      <diffuse>0.9 0.9 0.9 1</diffuse>
+      <specular>0.1 0.1 0.1 1</specular>
+    </light>
+
+    <!-- ========================================== -->
+    <!-- 4. STATIC ENVIRONMENT MODELS               -->
+    <!-- ========================================== -->
+    <!-- 
+      The <static>true</static> tag is crucial here. It tells the physics engine:
+      "Do not calculate gravity or collisions to move this object." 
+      It locks the shed and posts perfectly in place, saving massive CPU power.
+    -->
+    <model name="shed">
+      <static>true</static>
+      <pose>5 5 0 0 0 0</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>3 4 2.5</size></box></geometry>
+          <material><ambient>0.5 0.2 0.2 1</ambient></material>
+        </visual>
+        <collision name="collision">
+          <geometry><box><size>3 4 2.5</size></box></geometry>
+        </collision>
+      </link>
+    </model>
+
+    <model name="post_nw">
+      <static>true</static>
+      <pose>10 10 0 0 0 0</pose>
+      <link name="link">
+        <visual name="visual"><geometry><cylinder><radius>0.1</radius><length>2</length></cylinder></geometry></visual>
+        <collision name="collision"><geometry><cylinder><radius>0.1</radius><length>2</length></cylinder></geometry></collision>
+      </link>
+    </model>
+
+    <model name="post_sw">
+      <static>true</static>
+      <pose>-10 10 0 0 0 0</pose>
+      <link name="link">
+        <visual name="visual"><geometry><cylinder><radius>0.1</radius><length>2</length></cylinder></geometry></visual>
+        <collision name="collision"><geometry><cylinder><radius>0.1</radius><length>2</length></cylinder></geometry></collision>
+      </link>
+    </model>
+
+    <model name="post_se">
+      <static>true</static>
+      <pose>-10 -10 0 0 0 0</pose>
+      <link name="link">
+        <visual name="visual"><geometry><cylinder><radius>0.1</radius><length>2</length></cylinder></geometry></visual>
+        <collision name="collision"><geometry><cylinder><radius>0.1</radius><length>2</length></cylinder></geometry></collision>
+      </link>
+    </model>
+
+  </world>
+</sdf>
