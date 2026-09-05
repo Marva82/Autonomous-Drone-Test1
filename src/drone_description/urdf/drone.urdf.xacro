@@ -2,6 +2,28 @@
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="quadcopter">
 
   <!-- ========================================== -->
+  <!-- MASS BUDGET DASHBOARD (in kg)              -->
+  <!-- ========================================== -->
+  <!-- Body: 900g -->
+  <xacro:property name="mass_body" value="0.900" />
+  <!-- Battery: 400g -->
+  <xacro:property name="mass_battery" value="0.400" />
+  <!-- 4 Arms: 80g total (20g each) -->
+  <xacro:property name="mass_arm" value="0.020" />
+  <!-- 4 Motors: 55g each -->
+  <xacro:property name="mass_motor" value="0.055" />
+  <!-- Gimbal + Camera: 50g total -->
+  <xacro:property name="mass_gimbal_cam" value="0.050" />
+  
+  <!-- ========================================== -->
+  <!-- THRUST CONSTRAINTS (Reference Only)        -->
+  <!-- Total Mass: 1.645 kg (~1.65 kg)            -->
+  <!-- Target Hover Force (1g): 16.19 N           -->
+  <!-- Target Max Thrust (2:1): 32.38 N           -->
+  <!-- Required per motor: 8.09 N                 -->
+  <!-- ========================================== -->
+
+  <!-- ========================================== -->
   <!-- 1. INERTIA MATH MACROS                     -->
   <!-- Automatically calculates physics based on mass and size -->
   <!-- ========================================== -->
@@ -34,13 +56,15 @@
     <collision>
       <geometry><box size="0.2 0.2 0.05"/></geometry>
     </collision>
-    <xacro:box_inertia m="0.6" x="0.2" y="0.2" z="0.05"/>
+    <!-- UPDATED: Replaced hardcoded 0.6 with the mass_body variable -->
+    <xacro:box_inertia m="${mass_body}" x="0.2" y="0.2" z="0.05"/>
   </link>
 
   <!-- The battery shifts the center of gravity -->
   <link name="battery_link">
     <visual><geometry><box size="0.1 0.05 0.04"/></geometry></visual>
-    <xacro:box_inertia m="0.4" x="0.1" y="0.05" z="0.04"/>
+    <!-- UPDATED: Replaced hardcoded 0.4 with the mass_battery variable -->
+    <xacro:box_inertia m="${mass_battery}" x="0.1" y="0.05" z="0.04"/>
   </link>
 
   <joint name="battery_joint" type="fixed">
@@ -59,7 +83,8 @@
     <!-- The Arm Link -->
     <link name="arm_${prefix}">
       <visual><geometry><cylinder radius="0.01" length="0.15"/></geometry></visual>
-      <xacro:cylinder_inertia m="0.1" r="0.01" h="0.15"/>
+      <!-- UPDATED: Replaced hardcoded 0.1 with the mass_arm variable -->
+      <xacro:cylinder_inertia m="${mass_arm}" r="0.01" h="0.15"/>
     </link>
 
     <!-- Welded to the base -->
@@ -75,7 +100,8 @@
       <visual><geometry><cylinder radius="0.1" length="0.01"/></geometry></visual>
       <!-- Collision is ONLY the hub, not the blades -->
       <collision><geometry><cylinder radius="0.02" length="0.01"/></geometry></collision>
-      <xacro:cylinder_inertia m="0.05" r="0.1" h="0.01"/>
+      <!-- UPDATED: Replaced hardcoded 0.05 with the mass_motor variable -->
+      <xacro:cylinder_inertia m="${mass_motor}" r="0.1" h="0.01"/>
     </link>
 
     <!-- Continuous joint spinning on the Z axis -->
@@ -99,7 +125,8 @@
   <!-- ========================================== -->
   <link name="gimbal_link">
     <visual><geometry><box size="0.02 0.02 0.02"/></geometry></visual>
-    <xacro:box_inertia m="0.025" x="0.02" y="0.02" z="0.02"/>
+    <!-- UPDATED: Dividing the total 50g gimbal/cam budget in half for the gimbal -->
+    <xacro:box_inertia m="${mass_gimbal_cam / 2}" x="0.02" y="0.02" z="0.02"/>
   </link>
 
   <joint name="gimbal_pitch_joint" type="revolute">
@@ -113,7 +140,8 @@
 
   <link name="camera_link">
     <visual><geometry><box size="0.03 0.03 0.03"/></geometry></visual>
-    <xacro:box_inertia m="0.025" x="0.03" y="0.03" z="0.03"/>
+    <!-- UPDATED: Dividing the total 50g gimbal/cam budget in half for the camera -->
+    <xacro:box_inertia m="${mass_gimbal_cam / 2}" x="0.03" y="0.03" z="0.03"/>
   </link>
 
   <joint name="camera_joint" type="fixed">
