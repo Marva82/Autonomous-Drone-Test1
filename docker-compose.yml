@@ -1,0 +1,51 @@
+# docker-compose.yml
+
+services:
+  # ==========================================
+  # 1. THE PHYSICS ENGINE (GAZEBO)
+  # ==========================================
+  gazebo:
+    # Assumes you have a Dockerfile inside a 'gazebo' folder
+    build: ./gazebo
+    image: custom_gazebo:latest
+    # Exposing the FDM socket so ArduPilot can send JSON motor commands
+    ports:
+      - "9002:9002/udp"
+    # We run Gazebo HEADLESS (Server only) in this container
+    command: gz sim -s -r worlds/perimeter_site.sdf
+
+  # ==========================================
+  # 2. THE FLIGHT CONTROLLER (ARDUPILOT)
+  # ==========================================
+  ardupilot:
+    build: ./ardupilot
+    image: custom_ardupilot:latest
+    # MAVProxy requires an interactive terminal to run, otherwise it crashes immediately.
+    # These two flags provide the standard input (stdin) and teletype (tty).
+    stdin_open: true 
+    tty: true
+    # Wait for Gazebo to exist on the network before starting ArduPilot
+    depends_on:
+      - gazebo
+    ports:
+      - "5760:5760/tcp"  # MAVLink Master for MAVROS
+      - "5762:5762/tcp"  # Serial 1 for PyMAVLink debugging
+      - "14550:14550/udp" # Output for QGroundControl
+    
+    # Example of the run script concept:
+    # Before ArduPilot starts, a script (run.sh) usually checks the internal DNS.
+    # It runs a loop using: getent hosts gazebo
+    # It will pause until 'gazebo' returns an IP address, proving the physics engine is up.
+
+  # ==========================================
+  # 3. THE HUMAN INTERFACE (QGROUNDCONTROL)
+  # ==========================================
+  qgc:
+    build: ./qgc
+    image: custom_qgc:latest
+    # Using a profile makes this container OPTIONAL. 
+    # When you run standard docker compose up, QGC will NOT start.
+    # You only bring it up when you want the GUI.
+    profiles: ["gui"]
+    # In a real setup, QGC requires X11 socket sharing to render the GUI on your host monitor
+    network_mode: "host"
